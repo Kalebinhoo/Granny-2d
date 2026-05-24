@@ -1,6 +1,5 @@
 // ==================== DISCORD SDK ====================
-const discordSdk = new window.DiscordSDK('1508003195933425765');
-
+let discordSdk = null;
 let auth;
 let participants = new Map();
 let myUserId = null;
@@ -122,37 +121,51 @@ const objectTypes = {
 // ==================== INICIALIZAÇÃO DISCORD ====================
 async function initDiscord() {
     try {
-        // Autenticar com Discord
-        await discordSdk.ready();
-        
-        const { code } = await discordSdk.commands.authorize({
-            client_id: '1508003195933425765',
-            response_type: 'code',
-            state: '',
-            prompt: 'none',
-            scope: ['identify', 'guilds']
-        });
-        
-        // Trocar código por token de acesso
-        const response = await fetch('/.proxy/api/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ code }),
-        });
-        
-        const { access_token } = await response.json();
-        auth = await discordSdk.commands.authenticate({ access_token });
-        
-        if (auth == null) {
-            throw new Error('Authenticate command failed');
+        // Tentar inicializar Discord SDK
+        if (window.DiscordSDK) {
+            discordSdk = new window.DiscordSDK('1508003195933425765');
+            
+            // Autenticar com Discord
+            await discordSdk.ready();
+            
+            const { code } = await discordSdk.commands.authorize({
+                client_id: '1508003195933425765',
+                response_type: 'code',
+                state: '',
+                prompt: 'none',
+                scope: ['identify', 'guilds']
+            });
+            
+            // Trocar código por token de acesso
+            const response = await fetch('/.proxy/api/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code }),
+            });
+            
+            const { access_token } = await response.json();
+            auth = await discordSdk.commands.authenticate({ access_token });
+            
+            if (auth == null) {
+                throw new Error('Authenticate command failed');
+            }
+            
+            myUserId = auth.user.id;
+            
+            // Subscrever a eventos de participantes
+            discordSdk.subscribe('ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE', updateParticipants);
+            
+            console.log('Discord SDK inicializado com sucesso!');
+        } else {
+            console.log('Discord SDK não disponível - modo standalone');
+            // Modo standalone para testes
+            myUserId = 'local-player';
+            myRole = 'player';
+            participants.set('local-player', { username: 'Jogador Local' });
+            participants.set('local-granny', { username: 'Granny (Bot)' });
         }
-        
-        myUserId = auth.user.id;
-        
-        // Subscrever a eventos de participantes
-        discordSdk.subscribe('ACTIVITY_INSTANCE_PARTICIPANTS_UPDATE', updateParticipants);
         
         // Inicializar jogo
         await init();
@@ -160,6 +173,10 @@ async function initDiscord() {
     } catch (error) {
         console.error('Erro ao inicializar Discord SDK:', error);
         // Modo offline para testes
+        myUserId = 'local-player';
+        myRole = 'player';
+        participants.set('local-player', { username: 'Jogador Local' });
+        participants.set('local-granny', { username: 'Granny (Bot)' });
         await init();
     }
 }
@@ -219,32 +236,36 @@ function updatePlayersWaiting() {
 function sendGameState() {
     if (!discordSdk) return;
     
-    const state = {
-        player: {
-            x: player.x,
-            y: player.y,
-            currentRoom: gameState.currentRoom,
-            inventory: player.inventory,
-            isHiding: gameState.isHiding
-        },
-        granny: {
-            x: granny.x,
-            y: granny.y,
-            currentRoom: granny.currentRoom
-        },
-        rooms: rooms,
-        currentDay: gameState.currentDay
-    };
-    
-    // Enviar estado via Discord SDK
-    discordSdk.commands.setActivity({
-        activity: {
-            type: 0,
-            details: `Dia ${gameState.currentDay}/5`,
-            state: myRole === 'player' ? 'Fugindo da Granny' : 'Caçando o sobrevivente',
-            instance: true
-        }
-    });
+    try {
+        const state = {
+            player: {
+                x: player.x,
+                y: player.y,
+                currentRoom: gameState.currentRoom,
+                inventory: player.inventory,
+                isHiding: gameState.isHiding
+            },
+            granny: {
+                x: granny.x,
+                y: granny.y,
+                currentRoom: granny.currentRoom
+            },
+            rooms: rooms,
+            currentDay: gameState.currentDay
+        };
+        
+        // Enviar estado via Discord SDK
+        discordSdk.commands.setActivity({
+            activity: {
+                type: 0,
+                details: `Dia ${gameState.currentDay}/5`,
+                state: myRole === 'player' ? 'Fugindo da Granny' : 'Caçando o sobrevivente',
+                instance: true
+            }
+        });
+    } catch (error) {
+        console.error('Erro ao enviar estado do jogo:', error);
+    }
 }
 
 // ==================== INICIALIZAÇÃO ====================
@@ -264,10 +285,11 @@ async function init() {
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
     document.getElementById('start-btn').addEventListener('click', () => {
-        if (participants.size >= 2) {
-            showScreen('difficulty-screen');
-        } else {
+        // Permitir iniciar em modo standalone
+        if (discordSdk && participants.size < 2) {
             alert('Aguarde 2 jogadores para começar!');
+        } else {
+            showScreen('difficulty-screen');
         }
     });
     
@@ -331,7 +353,8 @@ function showInstructions() {
 }
 
 function startGame() {
-    if (participants.size < 2) {
+    // Permitir iniciar mesmo sem 2 jogadores em modo standalone
+    if (discordSdk && participants.size < 2) {
         alert('Aguarde 2 jogadores para começar!');
         return;
     }
