@@ -1,0 +1,19 @@
+{
+  "name": "granny-2d-discord-activity",
+  "version": "1.0.0",
+  "description": "Granny 2D PvP mode for Discord Activities",
+  "main": "index.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "discord",
+    "activity",
+    "game",
+    "granny",
+    "pvp"
+  ],
+  "author": "",
+  "license": "MIT"
+}

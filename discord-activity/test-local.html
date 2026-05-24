@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Granny 2D - Teste Local</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div style="position: fixed; top: 10px; left: 10px; background: rgba(255,0,0,0.8); padding: 10px; border-radius: 5px; z-index: 9999;">
+        <strong>⚠️ MODO DE TESTE LOCAL</strong><br>
+        <small>Discord SDK desabilitado para testes</small>
+    </div>
+
+    <!-- Tela de Menu -->
+    <div id="menu-screen" class="screen active">
+        <h1 class="game-title">GRANNY</h1>
+        <div class="menu-buttons">
+            <button id="start-btn" class="menu-btn">JOGAR</button>
+            <button id="instructions-btn" class="menu-btn">INSTRUÇÕES</button>
+        </div>
+        <div id="discord-info">
+            <p>✅ Modo de teste local</p>
+            <div id="players-waiting">
+                <div class="player-indicator">Jogador 1 (Você - Sobrevivente)</div>
+                <div class="player-indicator">Jogador 2 (Bot - Granny)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tela de Instruções -->
+    <div id="instructions-screen" class="screen">
+        <h2>COMO JOGAR</h2>
+        <div class="instructions-content">
+            <p><strong>Objetivo:</strong> Escape da casa antes que a Granny te pegue!</p>
+            <p><strong>Controles:</strong></p>
+            <ul>
+                <li>← → ou A/D: Mover</li>
+                <li>E: Interagir (pegar itens, abrir portas, esconder)</li>
+                <li>Q: Soltar item</li>
+                <li>1, 2, 3: Selecionar slot do inventário</li>
+            </ul>
+            <p><strong>Modo PvP:</strong></p>
+            <ul>
+                <li>Jogador 1: Controla o sobrevivente</li>
+                <li>Jogador 2: Controla a Granny (WASD)</li>
+            </ul>
+            <p><strong>Dicas:</strong></p>
+            <ul>
+                <li>Esconda-se embaixo da cama ou dentro do armário</li>
+                <li>Colete chaves para abrir portas trancadas</li>
+                <li>Encontre a chave mestra para escapar!</li>
+                <li>Trabalhe em equipe ou compita!</li>
+            </ul>
+        </div>
+        <button id="back-btn" class="menu-btn">VOLTAR</button>
+    </div>
+
+    <!-- Tela de Seleção de Dificuldade -->
+    <div id="difficulty-screen" class="screen">
+        <h2>SELECIONE O MODO</h2>
+        <div class="difficulty-buttons">
+            <button class="difficulty-select" data-difficulty="player">JOGAR COMO SOBREVIVENTE</button>
+            <button class="difficulty-select" data-difficulty="granny">JOGAR COMO GRANNY</button>
+        </div>
+        <button id="back-difficulty-btn" class="menu-btn">VOLTAR</button>
+    </div>
+
+    <!-- Tela do Jogo -->
+    <div id="game-screen" class="screen">
+        <div id="hud">
+            <div id="room-name">QUARTO INICIAL</div>
+            <div id="day-counter">DIA 1/5</div>
+            <div id="inventory">
+                <div class="inventory-slot" data-slot="0"></div>
+                <div class="inventory-slot" data-slot="1"></div>
+                <div class="inventory-slot" data-slot="2"></div>
+            </div>
+        </div>
+        <canvas id="game-canvas"></canvas>
+        <div id="interaction-hint" class="hidden">Pressione E</div>
+        <div id="noise-indicator" class="hidden">BARULHO!</div>
+    </div>
+
+    <!-- Tela de Knockout -->
+    <div id="knockout-screen" class="screen">
+        <h1 class="knockout-title">VOCÊ FOI PEGO!</h1>
+        <p id="days-left">Dias restantes: 4</p>
+    </div>
+
+    <!-- Tela de Game Over -->
+    <div id="game-over-screen" class="screen">
+        <h1 class="game-over-title">GAME OVER</h1>
+        <p id="game-over-reason">Você não conseguiu escapar a tempo!</p>
+        <div class="menu-buttons">
+            <button id="retry-btn" class="menu-btn">TENTAR NOVAMENTE</button>
+            <button id="menu-btn" class="menu-btn">MENU</button>
+        </div>
+    </div>
+
+    <!-- Tela de Vitória -->
+    <div id="win-screen" class="screen">
+        <h1 class="win-title">VOCÊ ESCAPOU!</h1>
+        <p id="final-stats">Você escapou no dia 3 de 5!</p>
+        <div class="menu-buttons">
+            <button id="play-again-btn" class="menu-btn">JOGAR NOVAMENTE</button>
+            <button id="menu-btn-win" class="menu-btn">MENU</button>
+        </div>
+    </div>
+
+    <script>
+        // Mock do Discord SDK para testes locais
+        window.DiscordSDK = function() {
+            return {
+                ready: () => Promise.resolve(),
+                commands: {
+                    authorize: () => Promise.resolve({ code: 'test' }),
+                    authenticate: () => Promise.resolve({ user: { id: 'test-user-1' } }),
+                    setActivity: () => Promise.resolve()
+                },
+                subscribe: () => {}
+            };
+        };
+    </script>
+    <script src="game.js"></script>
+</body>
+</html>
