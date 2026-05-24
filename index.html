@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Granny 2D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Menu Principal -->
+        <div id="menu-screen" class="screen active">
+            <h1 class="game-title">GRANNY 2D</h1>
+            <div class="menu-buttons">
+                <button id="start-btn" class="menu-btn">JOGAR</button>
+                <button id="instructions-btn" class="menu-btn">INSTRUÇÕES</button>
+                <button id="difficulty-btn" class="menu-btn">DIFICULDADE</button>
+            </div>
+        </div>
+
+        <!-- Tela de Dificuldade -->
+        <div id="difficulty-screen" class="screen">
+            <h2>ESCOLHA A DIFICULDADE</h2>
+            <div class="menu-buttons">
+                <button class="menu-btn difficulty-select" data-difficulty="easy">FÁCIL (5 Dias)</button>
+                <button class="menu-btn difficulty-select" data-difficulty="normal">NORMAL (5 Dias)</button>
+                <button class="menu-btn difficulty-select" data-difficulty="hard">DIFÍCIL (5 Dias)</button>
+                <button class="menu-btn difficulty-select" data-difficulty="extreme">EXTREMO (5 Dias)</button>
+            </div>
+            <button id="back-difficulty-btn" class="menu-btn">VOLTAR</button>
+        </div>
+
+        <!-- Instruções -->
+        <div id="instructions-screen" class="screen">
+            <h2>INSTRUÇÕES</h2>
+            <div class="instructions-content">
+                <p><strong>OBJETIVO:</strong> Escape da casa da Granny em 5 dias!</p>
+                <p><strong>CONTROLES:</strong></p>
+                <ul>
+                    <li>← → ou A D - Mover</li>
+                    <li>E - Interagir/Pegar itens/Esconder</li>
+                    <li>Q - Soltar item</li>
+                    <li>1, 2, 3 - Usar itens do inventário</li>
+                </ul>
+                <p><strong>MECÂNICAS:</strong></p>
+                <ul>
+                    <li>Colete itens para desbloquear áreas</li>
+                    <li>Evite fazer barulho - Granny ouve tudo!</li>
+                    <li>Esconda-se em armários e debaixo da cama</li>
+                    <li>Se for pego, você desmaia e perde 1 dia</li>
+                    <li>Encontre todas as chaves e itens para abrir a porta principal</li>
+                    <li>Cuidado com armadilhas que fazem barulho!</li>
+                </ul>
+            </div>
+            <button id="back-btn" class="menu-btn">VOLTAR</button>
+        </div>
+
+        <!-- Tela do Jogo -->
+        <div id="game-screen" class="screen">
+            <div id="hud">
+                <div id="day-counter">DIA: <span id="day">1</span>/5</div>
+                <div id="inventory">
+                    <div class="inventory-slot" id="slot-1">
+                        <span class="slot-number">1</span>
+                        <span class="slot-item"></span>
+                    </div>
+                    <div class="inventory-slot" id="slot-2">
+                        <span class="slot-number">2</span>
+                        <span class="slot-item"></span>
+                    </div>
+                    <div class="inventory-slot" id="slot-3">
+                        <span class="slot-number">3</span>
+                        <span class="slot-item"></span>
+                    </div>
+                </div>
+                <div id="room-name">QUARTO INICIAL</div>
+            </div>
+            <canvas id="game-canvas"></canvas>
+            <div id="interaction-hint" class="hint hidden">Pressione E</div>
+            <div id="noise-indicator" class="noise-indicator hidden">
+                <div class="noise-wave"></div>
+                BARULHO!
+            </div>
+        </div>
+
+        <!-- Game Over -->
+        <div id="game-over-screen" class="screen">
+            <h2 class="game-over-title">VOCÊ FOI PEGO!</h2>
+            <p class="game-over-text">A Granny te encontrou...</p>
+            <p id="game-over-reason"></p>
+            <button id="retry-btn" class="menu-btn">TENTAR NOVAMENTE</button>
+            <button id="menu-btn" class="menu-btn">MENU PRINCIPAL</button>
+        </div>
+
+        <!-- Vitória -->
+        <div id="win-screen" class="screen">
+            <h2 class="win-title">VOCÊ ESCAPOU!</h2>
+            <p class="win-text">Parabéns! Você conseguiu fugir da casa!</p>
+            <p id="final-stats"></p>
+            <button id="play-again-btn" class="menu-btn">JOGAR NOVAMENTE</button>
+            <button id="menu-btn-win" class="menu-btn">MENU PRINCIPAL</button>
+        </div>
+
+        <!-- Tela de Transição (Desmaiou) -->
+        <div id="knockout-screen" class="screen">
+            <h2 class="knockout-title">VOCÊ DESMAIOU...</h2>
+            <p class="knockout-text">A Granny te levou de volta para a cama</p>
+            <p id="days-left"></p>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
